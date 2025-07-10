@@ -1,3 +1,14 @@
+from flask import Flask, request, jsonify
+import pandas as pd
+import requests
+import os
+
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "✅ API da Ellevo está no ar!"
+
 @app.route("/abrir-chamado", methods=["POST"])
 def abrir_chamado():
     try:
