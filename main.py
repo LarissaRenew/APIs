@@ -49,6 +49,7 @@ def abrir_chamado():
             headers = {
                 "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json"
+                "Accept": "application/json"
             }
 
             response = requests.post("https://renewsolutions.ellevo.com/api/v1/ticket", json=payload, headers=headers)
