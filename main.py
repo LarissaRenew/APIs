@@ -49,7 +49,7 @@ def abrir_chamado():
                 "Content-Type": "application/json"
             }
 
-            response = requests.post("https://seu-endpoint-ellevo.com/api/tickets", json=payload, headers=headers)
+            response = requests.post("https://renewsolutions.ellevo.com/api/v1/ticket", json=payload, headers=headers)
 
             chamados.append({
                 "linha": row.to_dict(),
