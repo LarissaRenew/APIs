@@ -1,14 +1,3 @@
-from flask import Flask, request, jsonify
-import pandas as pd
-import requests
-import os
-
-app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return "✅ API da Ellevo está no ar!"
-
 @app.route("/abrir-chamado", methods=["POST"])
 def abrir_chamado():
     try:
@@ -21,8 +10,15 @@ def abrir_chamado():
         df = pd.read_excel(excel_url)
 
         chamados = []
+        token = os.environ.get("TOKEN_ELLEVO")  # Token seguro via variável de ambiente
 
         for _, row in df.iterrows():
+            prazo_str = ""
+            try:
+                prazo_str = pd.to_datetime(row["prazo"]).isoformat()
+            except:
+                pass  # Se der erro, deixa em branco
+
             payload = {
                 "title": row["titulo"],
                 "private": 1,
@@ -32,7 +28,7 @@ def abrir_chamado():
                 "serviceReferenceCode": row["servico"],
                 "responsibleReferenceCode": row["responsavel"],
                 "status": "concluded",
-                "dueDate": row["prazo"],
+                "dueDate": prazo_str,
                 "forms": [
                     {
                         "referenceCode": row["formulario"],
@@ -45,7 +41,7 @@ def abrir_chamado():
             }
 
             headers = {
-                "Authorization": "Bearer {token}",
+                "Authorization": f"Bearer {token}",
                 "Content-Type": "application/json"
             }
 
@@ -54,14 +50,11 @@ def abrir_chamado():
             chamados.append({
                 "linha": row.to_dict(),
                 "status_code": response.status_code,
-                "resposta": response.json() if response.status_code == 200 else response.text
+                "resposta": response.json() if response.status_code in [200, 201] else response.text
             })
 
         return jsonify({"resultado": chamados}), 200
 
     except Exception as e:
+        print("Erro:", str(e))
         return jsonify({"erro": str(e)}), 500
-
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
