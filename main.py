@@ -1,3 +1,5 @@
+#Tenta conectar no Sharepoint via Azure
+
 import os
 from flask import Flask, jsonify, request
 from office365.runtime.auth.client_credential import ClientCredential
